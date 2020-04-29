@@ -27,6 +27,9 @@ const { Engine, Render, Runner, World, Bodies } = Matter;
 const width = 600;
 const height = 600;
 
+//cells
+const cells = 5;
+
 const engine = Engine.create();
 const { world } = engine;
 const render = Render.create({
@@ -43,6 +46,7 @@ Runner.run(Runner.create(), engine);
 
 // Create Walls
 const walls = [
+	// position - center of element (x,y, width, height )
 	Bodies.rectangle(width / 2, 0, width, 40, { isStatic: true }), //top
 	Bodies.rectangle(0, height / 2, 40, height, { isStatic: true }), //left
 	Bodies.rectangle(width, height / 2, 40, height, { isStatic: true }), //right
@@ -50,3 +54,25 @@ const walls = [
 ];
 //add walls
 World.add(world, walls);
+
+// maze generation
+
+// const grid = [];
+
+// for (let i = 0; i < 3; i++) {
+// 	grid.push([]);
+// 	for (let j = 0; j < 3; j++) {
+// 		grid[i].push(false);
+// 	}
+// }
+// console.log(grid);
+
+const grid = Array(cells).fill(null).map(() => {
+	return Array(cells).fill(false);
+});
+console.log(grid);
+
+// walls data
+const verticals = Array(cells).fill(null).map(() => Array(cells - 1).fill(false));
+
+const horizontals = Array(cells - 1).fill(null).map(() => Array(cells).fill(false));
