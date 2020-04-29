@@ -1,7 +1,7 @@
 //getting accest to matter objects
 const { Engine, Render, Runner, World, Bodies, MouseConstraint, Mouse } = Matter;
 
-const width = 800;
+const width = 600;
 const height = 600;
 
 const engine = Engine.create();
