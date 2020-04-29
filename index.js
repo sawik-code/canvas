@@ -28,7 +28,10 @@ const width = 600;
 const height = 600;
 
 //cells
-const cells = 5;
+const cells = 3;
+
+//wall length
+const unitLength = width / cells;
 
 const engine = Engine.create();
 const { world } = engine;
@@ -56,7 +59,17 @@ const walls = [
 World.add(world, walls);
 
 // maze generation
-
+const shuffle = (arr) => {
+	let counter = arr.length;
+	while (counter > 0) {
+		const index = Math.floor(Math.random() * counter);
+		counter--;
+		const temp = arr[counter];
+		arr[counter] = arr[index];
+		arr[index] = temp;
+	}
+	return arr;
+};
 // const grid = [];
 
 // for (let i = 0; i < 3; i++) {
@@ -70,9 +83,98 @@ World.add(world, walls);
 const grid = Array(cells).fill(null).map(() => {
 	return Array(cells).fill(false);
 });
-console.log(grid);
 
 // walls data
 const verticals = Array(cells).fill(null).map(() => Array(cells - 1).fill(false));
 
 const horizontals = Array(cells - 1).fill(null).map(() => Array(cells).fill(false));
+
+// pick random starting cell
+
+const startRow = Math.floor(Math.random() * cells);
+const startColumn = Math.floor(Math.random() * cells);
+
+console.log(startRow, startColumn);
+
+//iterating through maze cells
+const stepThroughCell = (row, column) => {
+	// check if i have visited cell at [row,col]
+	if (grid[row][column]) {
+		return;
+	}
+	// mark visited cell
+	grid[row][column] = true;
+
+	// assemble randomly order list of neigbour
+	const neighbours = [
+		[ row - 1, column, 'up' ],
+		[ row, column + 1, 'right' ],
+		[ row + 1, column, 'down' ],
+		[ row, column - 1, 'left' ]
+	];
+	shuffle(neighbours);
+
+	// foreach neighbour
+	for (const neighbor of neighbours) {
+		const [ nextRow, nextColumn, direction ] = neighbor;
+		//see if neigbor is out of bounds
+		if (nextRow < 0 || nextRow >= cells || nextColumn < 0 || nextColumn >= cells) {
+			continue; //don't do anything and continue loop
+		}
+		//check if we have visited that neighbour and continue to the next
+		if (grid[nextRow][nextColumn]) {
+			continue;
+		}
+		if (direction === 'left') {
+			verticals[row][column - 1] = true;
+		} else if (direction === 'right') {
+			verticals[row][column] = true;
+		} else if (direction === 'up') {
+			horizontals[row - 1][column] = true;
+		} else if (direction === 'down') {
+			horizontals[row][column] = true;
+		}
+		//remove a wall from either horizantal or vertical
+		stepThroughCell(nextRow, nextColumn);
+	}
+};
+
+stepThroughCell(startRow, startColumn);
+
+// drawing horizontal segments
+horizontals.forEach((row, rowIndex) => {
+	row.forEach((open, columnIndex) => {
+		if (open) {
+			return;
+		}
+		const wall = Bodies.rectangle(
+			columnIndex * unitLength + unitLength / 2,
+			rowIndex * unitLength + unitLength,
+			unitLength,
+			10,
+			{
+				isStatic: true
+			}
+		);
+		World.add(world, wall);
+	});
+});
+
+// drawing vertical wals
+verticals.forEach((row, rowIndex) => {
+	row.forEach((open, columnIndex) => {
+		if (open) {
+			return;
+		}
+		const wall = Bodies.rectangle(
+			columnIndex * unitLength + unitLength,
+			rowIndex * unitLength + unitLength / 2,
+			10,
+			unitLength,
+			{
+				isStatic: true
+			}
+		);
+		World.add(world, wall);
+	});
+});
