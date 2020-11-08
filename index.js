@@ -25,8 +25,7 @@
 const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
 const cellsHorizontal = 40;
-const cellsVertical = 30;
-
+const cellsVertical = 40;
 const width = window.innerWidth;
 const height = window.innerHeight;
 // const width = 600;
@@ -47,7 +46,8 @@ const render = Render.create({
 	options: {
 		width: width,
 		height: height,
-		wireframes: false
+		wireframes: false,
+		background: '#1A535C'
 	}
 });
 Render.run(render);
@@ -161,7 +161,7 @@ horizontals.forEach((row, rowIndex) => {
 				isStatic: true,
 				label: 'wall',
 				render: {
-					fillStyle: 'red'
+					fillStyle: '#F7FFF7'
 				}
 			}
 		);
@@ -184,7 +184,7 @@ verticals.forEach((row, rowIndex) => {
 				isStatic: true,
 				label: 'wall',
 				render: {
-					fillStyle: 'red'
+					fillStyle: '#F7FFF7'
 				}
 			}
 		);
@@ -197,7 +197,7 @@ const goal = Bodies.rectangle(width - unitLengthX / 2, height - unitLengthY / 2,
 	isStatic: true,
 	label: 'goal',
 	render: {
-		fillStyle: 'green'
+		fillStyle: '#FFE66D'
 	}
 });
 World.add(world, goal);
@@ -207,29 +207,42 @@ const ballRadius = Math.min(unitLengthX, unitLengthY) / 4;
 const ball = Bodies.circle(unitLengthX / 2, unitLengthY / 2, ballRadius, {
 	label: 'ball',
 	render: {
-		fillStyle: 'blue'
+		fillStyle: 'red'
 	}
 });
 
 World.add(world, ball);
 
+//prevent scroll on up down left right key
+window.addEventListener(
+	'keydown',
+	function(e) {
+		// space and arrow keys
+		if ([ 32, 37, 38, 39, 40 ].indexOf(e.keyCode) > -1) {
+			e.preventDefault();
+		}
+	},
+	false
+);
 // moving the ball by wsad
 document.addEventListener('keydown', (event) => {
 	const { x, y } = ball.velocity; //get position
-	if (event.keyCode === 87) {
-		Body.setVelocity(ball, { x: x, y: y - 5 }); //adding 5 to speed of moving
+	const speed = 3;
+	if (event.keyCode === 87 || event.keyCode === 38) {
+		//up
+		Body.setVelocity(ball, { x: x, y: y - speed }); //adding 5 to speed of moving
 	}
-	if (event.keyCode === 68) {
+	if (event.keyCode === 68 || event.keyCode === 39) {
 		//right
-		Body.setVelocity(ball, { x: x + 5, y: y }); //adding 5 to speed of moving
+		Body.setVelocity(ball, { x: x + speed, y: y }); //adding 5 to speed of moving
 	}
-	if (event.keyCode === 83) {
+	if (event.keyCode === 83 || event.keyCode === 40) {
 		//down
-		Body.setVelocity(ball, { x: x, y: y + 5 }); //adding 5 to speed of moving
+		Body.setVelocity(ball, { x: x, y: y + speed }); //adding 5 to speed of moving
 	}
-	if (event.keyCode === 65) {
+	if (event.keyCode === 65 || event.keyCode === 37) {
 		//left
-		Body.setVelocity(ball, { x: x - 5, y: y }); //adding 5 to speed of moving
+		Body.setVelocity(ball, { x: x - speed, y: y }); //adding 5 to speed of moving
 	}
 });
 
